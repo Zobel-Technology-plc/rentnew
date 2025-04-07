@@ -1,8 +1,38 @@
 <x-app-layout>
-    <div x-data class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900"
+         x-data="{ 
+            dropdownOpen: false,
+            activeMenu: localStorage.getItem('activeMenu') || 'dashboard',
+            darkMode: localStorage.getItem('darkMode') === 'true'
+         }"
+         x-init="
+            Alpine.store('sidebar', {
+                isOpen: localStorage.getItem('sidebarOpen') === 'true',
+                toggle() {
+                    this.isOpen = !this.isOpen;
+                    localStorage.setItem('sidebarOpen', this.isOpen);
+                }
+            });
+            
+            if (localStorage.getItem('sidebarOpen') === null) {
+                Alpine.store('sidebar').isOpen = window.innerWidth >= 1024;
+                localStorage.setItem('sidebarOpen', Alpine.store('sidebar').isOpen);
+            }
+
+            // Initialize dark mode
+            if (darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+         "
+         @toggle-sidebar.window="$store.sidebar.toggle()">
         <!-- Sidebar -->
         <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out"
-               :class="{'translate-x-0': $store.sidebar.open, '-translate-x-full': !$store.sidebar.open}">
+               :class="{
+                   'translate-x-0': $store.sidebar.open,
+                   '-translate-x-full': !$store.sidebar.open
+               }">
             
             <!-- Logo Section with visible close button -->
             <div class="flex items-center justify-between h-16 px-6 border-b dark:border-gray-700">
@@ -14,14 +44,11 @@
                     </div>
                     <span class="text-xl font-bold text-gray-800 dark:text-white">SuperAdmin Panel</span>
                 </div>
-                <!-- Desktop Close Button - Always Visible -->
+                <!-- Desktop Close Button -->
                 <button @click="$store.sidebar.toggle()" 
-                        class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200">
-                    <svg x-show="$store.sidebar.open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="block p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                    <svg x-show="!$store.sidebar.open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
                 </button>
             </div>
@@ -48,6 +75,19 @@
             </div>
         </aside>
 
+        <!-- Add this mini sidebar for collapsed state -->
+        <div x-show="!$store.sidebar.open" 
+             class="fixed inset-y-0 left-0 z-50 w-20 bg-white dark:bg-gray-800 shadow-lg hidden lg:block">
+            <div class="flex flex-col items-center py-4">
+                <button @click="$store.sidebar.toggle()" 
+                        class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
         <!-- Backdrop -->
         <div x-show="$store.sidebar.open" 
              x-transition:enter="transition-opacity ease-linear duration-300"
@@ -62,7 +102,10 @@
 
         <!-- Main Content Area -->
         <main class="transition-all duration-300"
-              :class="{'lg:ml-64': $store.sidebar.open, 'lg:ml-20': !$store.sidebar.open}">
+              :class="{
+                  'lg:ml-64': $store.sidebar.open,
+                  'lg:ml-20': !$store.sidebar.open
+              }">
             <!-- Top Navigation Bar -->
             <nav class="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b dark:border-gray-700 shadow-sm">
                 <div class="px-4 sm:px-6">

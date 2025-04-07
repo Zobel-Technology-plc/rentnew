@@ -26,13 +26,18 @@
         <script>
             document.addEventListener('alpine:init', () => {
                 Alpine.store('sidebar', {
-                    open: localStorage.getItem('sidebarOpen') === null ? true : localStorage.getItem('sidebarOpen') === 'true',
+                    open: localStorage.getItem('sidebarOpen') === 'true',
                     toggle() {
                         this.open = !this.open;
-                        localStorage.setItem('sidebarOpen', this.open);
+                        localStorage.setItem('sidebarOpen', this.open.toString());
                     }
                 });
             });
+
+            // Set initial state if not exists
+            if (localStorage.getItem('sidebarOpen') === null) {
+                localStorage.setItem('sidebarOpen', 'true');
+            }
         </script>
     </head>
     <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
