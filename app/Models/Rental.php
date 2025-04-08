@@ -2,40 +2,46 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Rental extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'property_id',
-        'tenant_id',
+        'user_id',
+        'rental_number',
         'start_date',
         'end_date',
         'status',
-        'monthly_rent'
+        'total_amount',
+        'deposit_amount',
+        'notes',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'monthly_rent' => 'decimal:2'
+        'total_amount' => 'decimal:2',
+        'deposit_amount' => 'decimal:2',
     ];
 
     // Relationships
-    public function property(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Property::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function tenant(): BelongsTo
+    public function items(): HasMany
     {
-        return $this->belongsTo(User::class, 'tenant_id');
+        return $this->hasMany(RentalItem::class);
     }
 
-    public function transactions(): HasMany
+    public function payments(): HasMany
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Payment::class);
     }
 } 

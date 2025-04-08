@@ -23,13 +23,37 @@
                 </button>
                 
                 <!-- Page Title -->
-                <span class="text-lg font-semibold text-gray-800 dark:text-white ml-2">
+                <span class="text-lg font-semibold text-gray-800 dark:text-white ml-4">
                     {{ $title ?? 'Dashboard' }}
                 </span>
+
+                <!-- Navigation Links -->
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <!-- Equipment Management -->
+                    <x-nav-link :href="route('equipment.categories.index')" :active="request()->routeIs('equipment.categories.*')">
+                        {{ __('Equipment Categories') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('equipment.items.index')" :active="request()->routeIs('equipment.items.*')">
+                        {{ __('Equipment Items') }}
+                    </x-nav-link>
+
+                    <!-- Rental Management -->
+                    <x-nav-link :href="route('rentals.index')" :active="request()->routeIs('rentals.*')">
+                        {{ __('Rentals') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('maintenance.index')" :active="request()->routeIs('maintenance.*')">
+                        {{ __('Maintenance') }}
+                    </x-nav-link>
+                </div>
             </div>
 
             <!-- Right Side -->
             <div class="flex items-center">
+                <!-- Theme Toggle -->
+                <div class="mr-8">
+                    <x-theme-toggle />
+                </div>
+                
                 <!-- Profile Dropdown -->
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -58,6 +82,27 @@
                     </x-slot>
                 </x-dropdown>
             </div>
+        </div>
+    </div>
+
+    <!-- Responsive Navigation Menu -->
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+        <div class="pt-2 pb-3 space-y-1">
+            <!-- Equipment Management (Mobile) -->
+            <x-responsive-nav-link :href="route('equipment.categories.index')" :active="request()->routeIs('equipment.categories.*')">
+                {{ __('Equipment Categories') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('equipment.items.index')" :active="request()->routeIs('equipment.items.*')">
+                {{ __('Equipment Items') }}
+            </x-responsive-nav-link>
+
+            <!-- Rental Management (Mobile) -->
+            <x-responsive-nav-link :href="route('rentals.index')" :active="request()->routeIs('rentals.*')">
+                {{ __('Rentals') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('maintenance.index')" :active="request()->routeIs('maintenance.*')">
+                {{ __('Maintenance') }}
+            </x-responsive-nav-link>
         </div>
     </div>
 </nav>

@@ -6,13 +6,33 @@ window.Alpine = Alpine;
 
 // Dark mode initialization
 document.addEventListener('alpine:init', () => {
-    Alpine.data('darkMode', () => ({
-        dark: localStorage.getItem('darkMode') === 'true',
+    Alpine.store('darkMode', {
+        value: localStorage.getItem('darkMode') === 'true',
         toggle() {
-            this.dark = !this.dark;
-            localStorage.setItem('darkMode', this.dark);
+            this.value = !this.value;
+            localStorage.setItem('darkMode', this.value);
+            document.documentElement.classList.toggle('dark', this.value);
         }
-    }));
+    });
+
+    // Sidebar store initialization
+    Alpine.store('sidebar', {
+        open: localStorage.getItem('sidebarOpen') === 'true',
+        toggle() {
+            this.open = !this.open;
+            localStorage.setItem('sidebarOpen', this.open);
+        }
+    });
+    
+    // Initialize dark mode on page load
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+    }
+
+    // Initialize sidebar state if not exists
+    if (localStorage.getItem('sidebarOpen') === null) {
+        localStorage.setItem('sidebarOpen', 'true');
+    }
 });
 
 // Chart.js default configuration

@@ -1,221 +1,126 @@
-<x-app-layout>
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900" 
-         x-data="{ 
-            dropdownOpen: false,
-            activeMenu: localStorage.getItem('activeMenu') || 'dashboard'
-         }"
-         x-init="
-            Alpine.store('sidebar', {
-                isOpen: localStorage.getItem('sidebarOpen') === 'true',
-                toggle() {
-                    this.isOpen = !this.isOpen;
-                    localStorage.setItem('sidebarOpen', this.isOpen);
-                }
-            });
-            
-            if (localStorage.getItem('sidebarOpen') === null) {
-                Alpine.store('sidebar').isOpen = window.innerWidth >= 1024;
-                localStorage.setItem('sidebarOpen', Alpine.store('sidebar').isOpen);
-            }
-         "
-         @toggle-sidebar.window="$store.sidebar.toggle()">
-        
-        <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out bg-white dark:bg-gray-800 shadow-lg"
-             :class="{
-                'translate-x-0': $store.sidebar.isOpen,
-                '-translate-x-full': !$store.sidebar.isOpen
-             }">
-            
-            <!-- Logo Section -->
-            <div class="flex items-center justify-between h-16 px-6 border-b dark:border-gray-700">
-                <div class="flex items-center space-x-3">
-                    <div class="p-2 bg-primary-500 rounded-lg">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                    </div>
-                    <span class="text-xl font-bold text-gray-800 dark:text-white">Dashboard</span>
-                </div>
-                <!-- Sidebar Close Button -->
-                <button @click="$store.sidebar.toggle()" 
-                        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden
-                               focus:outline-none transition-colors duration-200
-                               text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-500">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" 
-                              d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data 
+      :class="{ 'dark': $store.darkMode.value }">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-            <!-- Navigation -->
-            <nav class="px-4 py-6 space-y-2">
-                <x-sidebar-link icon="home" label="Dashboard" route="dashboard" :active="request()->routeIs('dashboard')"/>
-                <!-- Reports Dropdown -->
-                <div class="space-y-1">
-                    <button @click="dropdownOpen = !dropdownOpen" 
-                            class="flex items-center justify-between w-full px-4 py-2 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                            </svg>
-                            <span>Reports</span>
-                        </div>
-                        <svg class="w-4 h-4 transition-transform duration-200" 
-                             :class="{'rotate-180': dropdownOpen}"
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Additional Styles -->
+        @stack('styles')
+    </head>
+    <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div class="min-h-screen flex">
+            <!-- Sidebar -->
+            <div x-data="{ open: $store.sidebar.open }" 
+                 :class="{ 'translate-x-0': open, '-translate-x-full': !open }"
+                 class="fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-200 ease-in-out">
+                <div class="flex items-center justify-between h-16 px-4 border-b dark:border-gray-700">
+                    <div class="flex items-center">
+                        <a href="{{ route('dashboard') }}" class="text-xl font-bold text-gray-800 dark:text-white">
+                            {{ config('app.name') }}
+                        </a>
+                    </div>
+                    <button @click="$store.sidebar.toggle()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    
-                    <!-- Dropdown Content -->
-                    <div x-show="dropdownOpen" 
-                         x-transition:enter="transition ease-out duration-100"
-                         x-transition:enter-start="transform opacity-0 scale-95"
-                         x-transition:enter-end="transform opacity-100 scale-100"
-                         class="pl-10 space-y-1">
-                        <a href="{{ route('analytics.index') }}" class="block px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Analytics</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Performance</a>
-                    </div>
                 </div>
 
-                <!-- Other Menu Items -->
-                <a href="{{ route('users.index') }}" class="flex items-center px-4 py-2 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                    </svg>
-                    <span>Users</span>
-                </a>
-                <a href="{{ route('settings.index') }}" class="flex items-center px-4 py-2 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span>Settings</span>
-                </a>
-            </nav>
+                <nav class="mt-5 px-2">
+                    <a href="{{ route('dashboard') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white' }}">
+                        <svg class="mr-4 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
+                    </a>
 
-            <!-- Theme Toggle -->
-            <div class="absolute bottom-0 w-full p-4 border-t dark:border-gray-700">
-                <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)"
-                        class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                    <span>Theme</span>
-                    <div class="relative">
-                        <div class="w-10 h-5 bg-gray-200 dark:bg-gray-700 rounded-full transition-colors duration-200"></div>
-                        <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transform transition-transform duration-200"
-                             :class="{'translate-x-5': darkMode}"></div>
+                    <!-- Add more navigation items here -->
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col min-h-screen">
+                <!-- Top Navigation -->
+                <header class="bg-white dark:bg-gray-800 shadow">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="flex justify-between h-16">
+                            <div class="flex">
+                                <button @click="$store.sidebar.toggle()" class="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:text-gray-400">
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center">
+                                <!-- Theme Toggle -->
+                                <button @click="$store.darkMode.toggle()" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none">
+                                    <svg x-show="!$store.darkMode.value" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                    </svg>
+                                    <svg x-show="$store.darkMode.value" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </button>
+
+                                <!-- User Dropdown -->
+                                <div class="ml-3 relative">
+                                    <x-dropdown align="right" width="48">
+                                        <x-slot name="trigger">
+                                            <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none transition duration-150 ease-in-out">
+                                                <div>{{ Auth::user()->name }}</div>
+                                                <div class="ml-1">
+                                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            </button>
+                                        </x-slot>
+
+                                        <x-slot name="content">
+                                            <x-dropdown-link :href="route('profile.edit')">
+                                                {{ __('Profile') }}
+                                            </x-dropdown-link>
+
+                                            <!-- Authentication -->
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
+                                                <x-dropdown-link :href="route('logout')"
+                                                    onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                                    {{ __('Log Out') }}
+                                                </x-dropdown-link>
+                                            </form>
+                                        </x-slot>
+                                    </x-dropdown>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </button>
+                </header>
+
+                <!-- Page Content -->
+                <main class="flex-1">
+                    <div class="py-6">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            {{ $slot }}
+                        </div>
+                    </div>
+                </main>
             </div>
         </div>
 
-        <!-- Mobile Overlay -->
-        <div x-show="$store.sidebar.isOpen && window.innerWidth < 1024" 
-             class="fixed inset-0 z-20 bg-gray-900/50"
-             @click="$store.sidebar.toggle()"
-             x-transition:enter="transition-opacity ease-in-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition-opacity ease-in-out duration-300"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0">
-        </div>
-
-        <!-- Main Content -->
-        <div class="transition-all duration-300"
-             :class="{
-                'ml-0': !$store.sidebar.isOpen,
-                'ml-64': $store.sidebar.isOpen
-             }">
-            <!-- Content Area -->
-            <main class="p-6">
-                @isset($header)
-                    <header class="mb-6">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                            {{ $header }}
-                        </h2>
-                    </header>
-                @endisset
-
-                <!-- Page Content -->
-                <div class="py-4">
-                    {{ $slot ?? '' }}
-                </div>
-            </main>
-        </div>
-    </div>
-
-    @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const isDarkMode = localStorage.getItem('darkMode') === 'true';
-        const chartData = {
-            months: ($userGrowth['labels'] ?? []),
-            growth: ($userGrowth['data'] ?? []),
-            users: {
-                active: {$activeUsers},
-                pending: { $pendingUsers},
-                blocked: {$blockedUsers}
-            }
-        };
-
-        const chartConfig = {
-            userGrowth: {
-                type: 'line',
-                data: {
-                    labels: chartData.months,
-                    datasets: [{
-                        label: 'New Users',
-                        data: chartData.growth,
-                        borderColor: '#3B82F6',
-                        tension: 0.3,
-                        fill: true,
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-                            }
-                        }
-                    }
-                }
-            },
-            userDistribution: {
-                type: 'doughnut',
-                data: {
-                    labels: ['Active', 'Pending', 'Blocked'],
-                    datasets: [{
-                        data: [chartData.users.active, chartData.users.pending, chartData.users.blocked],
-                        backgroundColor: ['#10B981', '#F59E0B', '#EF4444']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%'
-                }
-            }
-        };
-
-        // Initialize charts when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            new Chart(
-                document.getElementById('userGrowthChart').getContext('2d'),
-                chartConfig.userGrowth
-            );
-
-            new Chart(
-                document.getElementById('userDistributionChart').getContext('2d'),
-                chartConfig.userDistribution
-            );
-        });
-    </script>
-    @endpush
-</x-app-layout>
+        @stack('scripts')
+    </body>
+</html>

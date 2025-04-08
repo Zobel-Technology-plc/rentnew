@@ -8,6 +8,11 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\Admin\CompanySettingController;
+use App\Http\Controllers\EquipmentCategoryController;
+use App\Http\Controllers\EquipmentItemController;
+use App\Http\Controllers\MaintenanceRecordController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RentalController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -54,6 +59,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/analytics', [AnalyticsController::class, 'index'])->name('superadmin.analytics');
             Route::get('/settings', [SettingsController::class, 'index'])->name('superadmin.settings');
         });
+
+    // Equipment Categories
+    Route::resource('equipment/categories', EquipmentCategoryController::class)
+        ->names('equipment.categories');
+
+    // Equipment Items
+    Route::resource('equipment/items', EquipmentItemController::class)
+        ->names('equipment.items');
+
+    // Rentals
+    Route::resource('rentals', RentalController::class);
+    Route::post('rentals/{rental}/payments', [PaymentController::class, 'store'])
+        ->name('rentals.payments.store');
+    Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])
+        ->name('payments.destroy');
+
+    // Maintenance Records
+    Route::resource('maintenance', MaintenanceRecordController::class);
+    Route::post('maintenance/{record}/complete', [MaintenanceRecordController::class, 'complete'])
+        ->name('maintenance.complete');
 });
 
 require __DIR__.'/auth.php';
